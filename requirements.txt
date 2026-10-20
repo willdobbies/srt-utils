@@ -1,5 +1,0 @@
-googletrans==3.1.0a0
-fuzzywuzzy
-srt
-pylrc
-deepl

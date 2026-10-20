@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "srt-utils"
+dynamic = ["version"]
+description = "A collection of SRT related utility scripts"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "srt",
+]
+
+[project.scripts]
+srt-inject = "srt_utils.inject:main"
+srt-splitaudio = "srt_utils.splitaudio:main"
+srt-cat = "srt_utils.cat:main"
