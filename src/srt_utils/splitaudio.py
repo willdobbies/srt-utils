@@ -24,29 +24,32 @@ def main():
 
     # detect output filename format
     # audio_name, audio_ext = os.path.splitext(args.audio)
-    chop_zfill = len(srt_lines) // 10  # get_pot(len(srt_parse))
 
+    zfill_pad = len(str(len(srt_lines)))
     for idx, sub in enumerate(srt_lines):
         dur = sub.end - sub.start
 
-        chop_outpath = args.audio.name.with_suffix(f"{idx:chop_zfill}.{args.audio.suffix}")
+        chopidx = str(idx).zfill(zfill_pad)
+        chop_outpath = args.audio.with_suffix(f".{chopidx}{args.audio.suffix}")
 
         cmd = [
             "ffmpeg",
             "-ss",
-            sub.start,
+            str(sub.start.total_seconds()),
             "-i",
-            f"'{args.audio}'",
+            f"{args.audio}",
             "-t",
-            dur,
-            f"'{chop_outpath}'",
+            str(dur.total_seconds()),
+            "-c",
+            "copy",
+            f"{chop_outpath}",
         ]
 
         print(f"Execute: {cmd}")
         if args.dry:
             continue
         
-        subprocess.run(cmd, shell=True, check=True)
+        subprocess.run(cmd, check=True)
 
 if __name__ == "__main__":
     main()
