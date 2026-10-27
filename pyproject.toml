@@ -3,16 +3,17 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "srt-utils"
+name = "sub-utils"
 dynamic = ["version"]
-description = "A collection of SRT related utility scripts"
+description = "Subtitle manipulation commandline utilities"
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = [
-    "srt",
-]
+dependencies = ["pysubs2"]
+
+[project.optional-dependencies]
+test = ["pytest"]
 
 [project.scripts]
-srt-inject = "srt_utils.inject:main"
-srt-splitaudio = "srt_utils.splitaudio:main"
-srt-cat = "srt_utils.cat:main"
+sub-inject = "sub_utils.inject:main"
+sub-splitaudio = "sub_utils.splitaudio:main"
+sub-cat = "sub_utils.cat:main"

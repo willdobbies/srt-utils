@@ -1,4 +1,0 @@
-[console_scripts]
-srt-cat = srt_utils.cat:main
-srt-inject = srt_utils.inject:main
-srt-splitaudio = srt_utils.splitaudio:main
