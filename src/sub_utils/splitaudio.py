@@ -1,19 +1,25 @@
 import argparse
+import shlex
 import subprocess
 from pathlib import Path
 
 import pysubs2
 
 
-def get_split_out_path(input : Path, index: int, padding: int) -> Path:
+def get_split_out_path(input: Path, index: int, padding: int) -> Path:
     padding = len(str(padding))
     idx_zfill = str(index).zfill(padding)
     return input.with_suffix(f".{idx_zfill}{input.suffix}")
 
-def get_ffmpeg_split_command(event : pysubs2.SSAEvent, input : Path, output : Path) -> str:
+
+def get_ffmpeg_split_command(event: pysubs2.SSAEvent, input: Path, output: Path) -> str:
     start = event.start / 1000
     end = (event.end - event.start) / 1000
-    return f"ffmpeg -ss {start:.3f} -i {input} -t {end:.3f} -c copy {output}"
+    return (
+        f"ffmpeg -ss {start:.3f} -i {shlex.quote(str(input))} "
+        f"-t {end:.3f} -c copy {shlex.quote(str(output))}"
+    )
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -24,6 +30,9 @@ def main():
     parser.add_argument("audio", type=Path, help="Path to audio file to slice")
     parser.add_argument(
         "--dry", action="store_true", help="Show commands without executing"
+    )
+    parser.add_argument(
+        "--encoding", type=str, default="utf-8", help="Encoding of utf-8"
     )
     args = parser.parse_args()
 

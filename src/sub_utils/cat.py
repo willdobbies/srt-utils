@@ -19,7 +19,7 @@ def main():
     )
     args = parser.parse_args()
 
-    subs = pysubs2.load(args.path, encoding=args.encoding)
+    subs = pysubs2.load(args.subs, encoding=args.encoding)
     cat_subs(subs)
 
 

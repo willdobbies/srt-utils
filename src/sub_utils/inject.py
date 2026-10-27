@@ -5,14 +5,15 @@ import pysubs2
 from .utils import get_path_format_identifier
 
 
-def inject_text(subs : pysubs2.SSAFile, lines : list) -> pysubs2.SSAFile:
+def inject_text(subs: pysubs2.SSAFile, lines: list) -> pysubs2.SSAFile:
     if len(lines) != len(subs):
         raise ValueError(f"Got line mismatch: txt {len(lines)} != subs {len(subs)}")
 
     for event, line in zip(subs, lines):
         event.plaintext = line
-    
+
     return subs
+
 
 def main():
     import argparse
@@ -35,19 +36,19 @@ def main():
         help="Print subtitle content to screen instead of writing",
     )
     args = parser.parse_args()
-    
+
     subs_format = get_path_format_identifier(args.subs)
 
-    subs = pysubs2.load(args.path, encoding=args.encoding)
+    subs = pysubs2.load(args.subs, encoding=args.encoding)
     txt = args.txt.read_text(encoding=args.encoding)
-    txt_lines = txt.split("\n")
+    txt_lines = txt.splitlines()
 
     subs = inject_text(subs, txt_lines)
 
-    if(args.print):
+    if args.print:
         print(subs.to_string(subs_format))
-    
-    subs.to_file(args.subs, subs_format)
+    else:
+        subs.save(args.subs, encoding=args.encoding, format_=subs_format)
 
 
 if __name__ == "__main__":
