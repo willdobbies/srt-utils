@@ -4,9 +4,11 @@ from pathlib import Path
 import pysubs2
 import pytest
 
+from sub_utils import apply_style as apply_style_module
 from sub_utils import cat as cat_module
 from sub_utils import inject as inject_module
 from sub_utils import splitaudio
+from sub_utils.apply_style import apply_config, parse_color
 from sub_utils.cat import cat_subs
 from sub_utils.inject import inject_text
 from sub_utils.splitaudio import get_ffmpeg_split_command, get_split_out_path
@@ -96,6 +98,65 @@ def test_inject_cli_print_does_not_write(srt, txt, monkeypatch, capsys):
 
     assert "Alpha" in capsys.readouterr().out
     assert srt.read_bytes() == original
+
+
+def test_parse_color_formats():
+    assert parse_color("#112233") == pysubs2.Color(0x11, 0x22, 0x33)
+    assert parse_color("&H80402010") == pysubs2.Color(0x10, 0x20, 0x40, 0x80)
+
+
+def test_apply_config_uses_raw_ass_names():
+    subs = pysubs2.SSAFile()
+    subs.styles["Default"] = pysubs2.SSAStyle()
+    subs.append(pysubs2.SSAEvent(start=0, end=1000, text="Hi", style="Default"))
+
+    apply_config(
+        subs,
+        {
+            "Fontname": "Noto Sans",
+            "Fontsize": 30,
+            "PrimaryColour": "#112233",
+            "Bold": True,
+            "Outline": 3,
+            "Alignment": 8,
+            "extra-styles": [
+                {"Name": "Signs", "PrimaryColour": "#FF0000", "Italic": True}
+            ],
+        },
+    )
+
+    default = subs.styles["Default"]
+    assert default.fontname == "Noto Sans"
+    assert default.fontsize == 30
+    assert default.primarycolor == pysubs2.Color(0x11, 0x22, 0x33)
+    assert default.bold is True
+    assert default.outline == 3
+    assert default.alignment == pysubs2.Alignment.TOP_CENTER
+
+    signs = subs.styles["Signs"]
+    assert signs.fontname == "Noto Sans"
+    assert signs.primarycolor == pysubs2.Color(255, 0, 0)
+    assert signs.italic is True
+
+
+def test_apply_style_cli(tmp_path, monkeypatch):
+    subs_path = tmp_path / "sample.ass"
+    subs = pysubs2.SSAFile()
+    subs.styles["Default"] = pysubs2.SSAStyle()
+    subs.append(pysubs2.SSAEvent(start=0, end=1000, text="Hi", style="Default"))
+    subs.save(subs_path)
+
+    config_path = tmp_path / "style.toml"
+    config_path.write_text('Fontname = "Noto Sans"\nFontsize = 30\n', encoding="utf-8")
+    monkeypatch.setattr(
+        sys, "argv", ["sub-apply-style", str(config_path), str(subs_path)]
+    )
+
+    apply_style_module.main()
+
+    reloaded = pysubs2.load(subs_path)
+    assert reloaded.styles["Default"].fontname == "Noto Sans"
+    assert reloaded.styles["Default"].fontsize == 30
 
 
 def test_splitaudio_cli_dry_run(srt, tmp_path, monkeypatch, capsys):

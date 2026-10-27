@@ -7,7 +7,7 @@ name = "sub-utils"
 dynamic = ["version"]
 description = "Subtitle manipulation commandline utilities"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 dependencies = ["pysubs2"]
 
 [project.optional-dependencies]
@@ -17,3 +17,4 @@ test = ["pytest"]
 sub-inject = "sub_utils.inject:main"
 sub-splitaudio = "sub_utils.splitaudio:main"
 sub-cat = "sub_utils.cat:main"
+sub-apply-style = "sub_utils.apply_style:main"
