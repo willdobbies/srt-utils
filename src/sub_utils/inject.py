@@ -5,6 +5,15 @@ import pysubs2
 from .utils import get_path_format_identifier
 
 
+def inject_text(subs : pysubs2.SSAFile, lines : list) -> pysubs2.SSAFile:
+    if len(lines) != len(subs):
+        raise ValueError(f"Got line mismatch: txt {len(lines)} != subs {len(subs)}")
+
+    for event, line in zip(subs, lines):
+        event.plaintext = line
+    
+    return subs
+
 def main():
     import argparse
 
@@ -30,25 +39,16 @@ def main():
     subs_format = get_path_format_identifier(args.subs)
 
     subs = pysubs2.load(args.path, encoding=args.encoding)
-    txt : str = args.txt.read_text(encoding=args.encoding)
+    txt = args.txt.read_text(encoding=args.encoding)
     txt_lines = txt.split("\n")
 
-    if len(txt_lines) != len(subs):
-        print(f"Got line mismatch: txt {len(txt_lines)} != subs {len(subs)}")
-        return 1
-
-    for event, line in zip(subs, txt_lines):
-        event.plaintext = line
+    subs = inject_text(subs, txt_lines)
 
     if(args.print):
         print(subs.to_string(subs_format))
-        return 0
     
     subs.to_file(args.subs, subs_format)
-    
-    return 0
 
 
 if __name__ == "__main__":
-    import sys
-    sys.exit(main())
+    main()
