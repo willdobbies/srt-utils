@@ -1,14 +1,12 @@
-"""Retime subtitles to the speech islands detected in their audio.
+"""Retime subtitles to the speech islands detected in a matching voice-only audio file.
 
-Whisper often stretches one line across a long SFX/music bed, or merges several
-sentences into one long cue. This tool trims each cue to the speech it covers
-and splits cues at significant internal pauses. It never rewrites cue text.
+The algorithm leverage's ffmpeg's `silencedetect` feature to detect speech islands, so
+ANY noise in the the reference audio data is treated as speech. Therefore, to get best results,
+use audio inputs that are speech only (no music, sound effects, etc.)
 
 Example:
     sub-fit 05.srt 05.flac --out 05.fit.srt --report 05.fit.json
 """
-
-from __future__ import annotations
 
 import argparse
 import json
@@ -301,7 +299,7 @@ def fit_subs(
 def main() -> int:
     defaults = Options()
     parser = argparse.ArgumentParser(
-        description="Retime subtitles to the speech islands in their audio"
+        description="Retime subtitles to the speech islands detected in a matching voice-only audio file"
     )
     parser.add_argument("subs", type=Path, help="Subtitle file to retime")
     parser.add_argument("audio", type=Path, help="Audio file to analyze")

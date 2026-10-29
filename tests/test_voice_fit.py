@@ -3,8 +3,8 @@ from types import SimpleNamespace
 
 import pysubs2
 
-from sub_utils import fit
-from sub_utils.fit import (
+from sub_utils import voice_fit
+from sub_utils.voice_fit import (
     Options,
     distribute,
     fit_subs,
@@ -34,8 +34,8 @@ def test_speech_islands_parses_ffmpeg_silence(tmp_path, monkeypatch):
         calls.append(command)
         return SimpleNamespace(returncode=0, stderr=stderr)
 
-    monkeypatch.setattr(fit.subprocess, "run", fake_run)
-    monkeypatch.setattr(fit, "probe_duration", lambda path: 3.0)
+    monkeypatch.setattr(voice_fit.subprocess, "run", fake_run)
+    monkeypatch.setattr(voice_fit, "probe_duration", lambda path: 3.0)
 
     islands = speech_islands(audio, Options())
 
@@ -126,12 +126,12 @@ def test_fit_cli_writes_output(tmp_path, monkeypatch):
     audio.write_bytes(b"")
     out = tmp_path / "out.srt"
 
-    monkeypatch.setattr(fit, "speech_islands", lambda *args: [(1.0, 2.0)])
+    monkeypatch.setattr(voice_fit, "speech_islands", lambda *args: [(1.0, 2.0)])
     monkeypatch.setattr(
         sys, "argv", ["sub-fit", str(subs_path), str(audio), "--out", str(out)]
     )
 
-    fit.main()
+    voice_fit.main()
 
     reloaded = pysubs2.load(out)
     assert [(event.start, event.end) for event in reloaded] == [(950, 2050)]
