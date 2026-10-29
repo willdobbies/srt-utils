@@ -31,13 +31,3 @@ audio.003.flac
 ```sh
 sub-apply-style config.toml subtitles.ass
 ```
-
-**`sub-fit`** — Retime subtitles to the speech detected in an audio file (requires: `ffmpeg`).
-
-The algorithm leverage's ffmpeg's `silencedetect` feature to detect speech islands, so
-ANY noise in the the reference audio data is treated as speech. Therefore, to get best results,
-use audio inputs that are speech only (no music, sound effects, etc.)
-
-```sh
-sub-fit subtitles.srt audio.flac --out fitted.srt
-```
