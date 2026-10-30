@@ -154,6 +154,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("config", type=Path, help="TOML style config")
     parser.add_argument("subtitles", nargs="+", type=Path, help=".ass files to update")
+    parser.add_argument("--format", default=".ass", type=str, help="Output format to use (.ass)")
     parser.add_argument(
         "--encoding", type=str, default="utf-8", help="Encoding of utf-8"
     )
@@ -165,6 +166,7 @@ def main():
     for path in args.subtitles:
         subs = pysubs2.load(path, encoding=args.encoding)
         apply_config(subs, config)
+        path = path.with_suffix(args.format)
         subs.save(path, encoding=args.encoding)
         print(f"styled {path}")
 
